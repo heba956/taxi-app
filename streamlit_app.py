@@ -2,10 +2,11 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-st.title('🚕 Pick up Trip')
-st.info('welcome to our taxi driver app based on machine learning')
+st.title('The Survivors')
+st.info('Welcome to Survivors Team's App')
 
-model = joblib.load("taxi_model.pkl")
+model1 = joblib.load("taxi_model.pkl")
+model2 =joblib.load("")
 columns = [
     'passenger_count', 'trip_distance', 'pickup_longitude', 'pickup_latitude',
     'dropoff_longitude', 'dropoff_latitude', 'improvement_surcharge',
