@@ -3,20 +3,18 @@ import pandas as pd
 import numpy as np
 import joblib
 
-
-# ----------------- Title -----------------
-st.title('The Survivors')
-st.info('Welcome to Survivors Team App')
-
 # ----------------- Sidebar Menu -----------------
 page = st.sidebar.radio(
     "Navigation",
-    ["Taxi Model", "Credit Model"]
+    ["Home",Taxi Model", "Credit Model"]
 )
-
+if page == "Home":
+    st.title("The Survivors")
+    st.info('Welcome to Survivors Team App')
+    
 # 🚕 Taxi Model Page
 
-if page == "Taxi Model":
+elif page == "Taxi Model":
     st.header("Pick up Trip")
     model1 = joblib.load("taxi_model.pkl")
     
