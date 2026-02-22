@@ -145,9 +145,10 @@ elif page == "Taxi Model":
     'RatecodeID_5': 1 if ratecode == "5" else 0
      }
 
-     df = pd.DataFrame([input_data])
-     st.write(df)
-     # 💳 Credit Model Page
+    df = pd.DataFrame([input_data])
+    st.write(df)
+
+# 💳 Credit Model Page
 
 elif page == "Credit Model":
     st.header("💳 Cre.")
