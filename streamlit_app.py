@@ -4,9 +4,7 @@ import numpy as np
 import joblib
 @st.cache_resource
 def load_model(path):
-    return joblib.load(path)
-
-model1 = load_model("taxi_model.pkl")  
+    return joblib.load(path) 
 # ----------------- Sidebar Menu -----------------
 page = st.sidebar.radio(
     "Navigation",
