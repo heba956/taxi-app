@@ -11,7 +11,7 @@ page = st.sidebar.radio(
 if page == "Home":
     st.title("The Survivors ⚡")
     st.info('Welcome to Survivors Team App')
-    
+    st.header("Our Team")
 # 🚕 Taxi Model Page
 
 elif page == "Taxi Model":
