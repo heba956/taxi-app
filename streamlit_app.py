@@ -67,70 +67,70 @@ elif page == "Taxi Model":
     # Passenger Count (مثلاً نسمح من 1 لـ 6)
     input_data['passenger_count'] = st.selectbox(
     "Passenger Count",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # trip distance
     input_data['trip_distance'] = st.selectbox(
     "Trip Total Distance",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # pickup longitude
     input_data['pickup_longitude'] = st.selectbox(
     "Pickup Longitude",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # pickup_latitude
     input_data['pickup_latitude'] = st.selectbox(
     "Pickup Latitude",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0
     )
     
     # dropoff_longitude
     input_data['dropoff_longitude'] = st.selectbox(
     "dropoff longitude",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     
     # 'dropoff_latitude',
     input_data['dropoff_latitude'] = st.selectbox(
     "dropoff_latitude ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     
     # improvement_surcharge
     input_data['improvement_surcharge'] = st.selectbox(
     "improvement_surcharge ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # trip_duration
     input_data['trip_duration'] = st.selectbox(
     "trip_duration ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0
     )
     # pickup_month
     input_data['pickup_month'] = st.selectbox(
     "pickup_month ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # pickup_day
     input_data['pickup_day'] = st.selectbox(
     "pickup_day ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # pickup_hour
     input_data['pickup_hour'] = st.selectbox(
     "pickup_hour ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # pickup_minute
     input_data['pickup_minute'] = st.selectbox(
     "pickup_minute ",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # distance_km
     input_data['distance_km'] = st.selectbox(
     "distance_km",
-    options=[1, 2, 3, 4, 5, 6,7,8]
+    options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0,7.0,8.0]
     )
     # Input
     vendor = st.selectbox("Vendor ID", ["1", "2"])
