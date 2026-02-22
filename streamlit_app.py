@@ -12,7 +12,8 @@ if page == "Home":
     st.title("The Survivors ⚡")
     st.info('Welcome to Survivors Team App')
     st.header("Our Team :-")
-    st.write("Heba Hassan\n Bassant Mohammed")
+    st.subheader("Heba Hassan")
+    st.subheader("Bassant Mohammed")
 # 🚕 Taxi Model Page
 
 elif page == "Taxi Model":
