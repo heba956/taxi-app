@@ -12,7 +12,12 @@ if os.path.exists(data_path):
 else:
     data = pd.DataFrame()  # نسخة فاضية لو الملف مش موجود
     st.warning(f"Dataset '{data_path}' not found! Please make sure it's in the app folder.")
-
+if data is not None:
+    df = data.copy()
+    numeric_cols = df.select_dtypes(include=np.number).columns
+    plt.figure(figsize=(8,6))
+    sns.heatmap(df[numeric_cols].corr(), annot=True, fmt=".2f", cmap="coolwarm")
+    st.pyplot(plt.gcf())
            
 @st.cache_resource
 def load_model(path):
