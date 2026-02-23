@@ -171,28 +171,72 @@ elif page == "Taxi Model":
         
 elif page == "Visualization":
     st.info("Model Visualization — Monte Carlo Simulation")
-    if data.empty:
-        st.warning("Dataset not loaded! Please load 'small_data.csv'.")
-    else:
-        df = data.copy()
-        required_cols = {
-            'trip_distance': (0, 20),
-            'trip_duration': (1, 20),
-            'fare_amount': (5, 50),
-            'pickup_latitude': (40, 41),
-            'pickup_longitude': (-74, -73)
-        }
-        for col, (low, high) in required_cols.items():
-            if col not in df.columns:
-                df[col] = np.random.uniform(low, high, size=len(df))
-            df[col] = pd.to_numeric(df[col], errors='coerce')
-            missing_idx = df[col].isna()
-            df.loc[missing_idx, col] = np.random.uniform(low, high, size=missing_idx.sum())
 
+    if data is None:
+        st.warning("Dataset not loaded! Please load 'small_data.csv' first to see the plots.")
+    else:
+        # ---------- Inputs ----------
+        N_PATHS = st.slider("Number of Simulated Paths", min_value=50, max_value=500, value=200, step=50)
+        max_distance = st.number_input("Max Distance (km)", min_value=1, max_value=500, value=100)
+
+        # ---------- Monte Carlo Dummy Data ----------
+        distances = np.linspace(0, max_distance, 100)
+        paths = [np.cumsum(np.random.rand(len(distances))*0.5) for _ in range(N_PATHS)]
+        final_fares = [path[-1] for path in paths]
+
+        paths_array = np.array(paths)
+        mean_path = np.mean(paths_array, axis=0)
+        p10_path = np.percentile(paths_array, 10, axis=0)
+        p25_path = np.percentile(paths_array, 25, axis=0)
+        p75_path = np.percentile(paths_array, 75, axis=0)
+        p90_path = np.percentile(paths_array, 90, axis=0)
+
+        def fare_to_color(fare):
+            norm = min(fare / max(final_fares), 1.0)
+            return f'rgba(0, {int(200*norm)}, 255, 0.3)'
+
+        # ---------- Plotly Monte Carlo ----------
+        fig_mc = go.Figure()
+        for i in range(N_PATHS):
+            fig_mc.add_trace(go.Scatter(
+                x=distances, y=paths[i], mode='lines',
+                line=dict(width=0.5, color=fare_to_color(final_fares[i])),
+                showlegend=False, hoverinfo='skip'
+            ))
+        # Percentile bands
+        fig_mc.add_trace(go.Scatter(
+            x=np.concatenate([distances, distances[::-1]]),
+            y=np.concatenate([p90_path, p10_path[::-1]]),
+            fill='toself', fillcolor='rgba(0,200,255,0.07)',
+            line=dict(color='rgba(0,0,0,0)'), name='P10–P90 Band'
+        ))
+        fig_mc.add_trace(go.Scatter(
+            x=np.concatenate([distances, distances[::-1]]),
+            y=np.concatenate([p75_path, p25_path[::-1]]),
+            fill='toself', fillcolor='rgba(0,200,255,0.12)',
+            line=dict(color='rgba(0,0,0,0)'), name='P25–P75 Band'
+        ))
+        fig_mc.add_trace(go.Scatter(
+            x=distances, y=mean_path, mode='lines',
+            line=dict(color='#FFE135', width=3.5),
+            name=f'Mean Fare (${mean_path[-1]:.2f} at {max_distance}km)'
+        ))
+        st.plotly_chart(fig_mc, use_container_width=True)
+        st.info(f"Insight: At 10km, the average fare is ${mean_path[50]:.2f}")
+        st.info(f"90% of rides cost between ${p10_path[50]:.2f} and ${p90_path[50]:.2f} at 10km")
+
+        # ---------- Matplotlib Scatter Plots ----------
         plt.style.use('dark_background')
 
+        # اتأكد من وجود الأعمدة
+        scatter_cols = ['trip_distance','trip_duration','fare_amount']
+        for col in scatter_cols:
+            if col not in data.columns:
+                data[col] = np.random.rand(len(data))*10
+
+        # 1️⃣ Trip Distance vs Fare
         fig1, ax1 = plt.subplots(figsize=(8,5))
-        ax1.scatter(df['trip_distance'], df['fare_amount'], alpha=0.6, color='#FFD700')
+        ax1.scatter(data['trip_distance'], data['fare_amount'], alpha=0.5, color='#8A2BE2')
         ax1.set_title("Trip Distance vs Fare Amount", color='white')
         ax1.set_xlabel("Trip Distance", color='white')
         ax1.set_ylabel("Fare Amount", color='white')
@@ -200,8 +244,9 @@ elif page == "Visualization":
         ax1.tick_params(axis='y', colors='white')
         st.pyplot(fig1)
 
+        # 2️⃣ Trip Duration vs Fare
         fig2, ax2 = plt.subplots(figsize=(8,5))
-        ax2.scatter(df['trip_duration'], df['fare_amount'], alpha=0.6, color='#00FFFF')
+        ax2.scatter(data['trip_duration'], data['fare_amount'], alpha=0.5, color='#008080')
         ax2.set_title("Trip Duration vs Fare Amount", color='white')
         ax2.set_xlabel("Trip Duration", color='white')
         ax2.set_ylabel("Fare Amount", color='white')
@@ -209,15 +254,15 @@ elif page == "Visualization":
         ax2.tick_params(axis='y', colors='white')
         st.pyplot(fig2)
 
-        bins = [0,5,10,15,20,25,30,40,50,75,200]
+        # 3️⃣ Fare Distribution Histogram
+        bins = [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 200]
         labels = ['$0–5','$5–10','$10–15','$15–20','$20–25','$25–30','$30–40','$40–50','$50–75','$75+']
-        df['fare_bucket'] = pd.cut(df['fare_amount'], bins=bins, labels=labels, include_lowest=True)
-        bucket_counts = df['fare_bucket'].value_counts().sort_index()
-
+        if 'fare_amount' not in data.columns:
+            data['fare_amount'] = np.random.rand(len(data))*50
+        data['fare_bucket'] = pd.cut(data['fare_amount'], bins=bins, labels=labels)
+        bucket_counts = data['fare_bucket'].value_counts().sort_index()
         fig3, ax3 = plt.subplots(figsize=(8,5))
-        ax3.bar(labels, bucket_counts, color='#00FF00', alpha=0.7)
-        ax3.set_facecolor('black')
-        fig3.patch.set_facecolor('black')
+        ax3.bar(labels, bucket_counts, color='#008080', alpha=0.7)
         ax3.set_title("Fare Distribution Histogram", color='white')
         ax3.set_xlabel("Fare Range ($)", color='white')
         ax3.set_ylabel("Number of Rides", color='white')
@@ -225,21 +270,16 @@ elif page == "Visualization":
         ax3.tick_params(axis='y', colors='white')
         st.pyplot(fig3)
 
+        # 4️⃣ Map Example (Plotly)
+        map_cols = ['pickup_latitude','pickup_longitude','fare_amount']
+        for col in map_cols:
+            if col not in data.columns:
+                data[col] = np.random.rand(len(data))*10
+        sample_size = min(5000, len(data))
+        df_map = data.sample(sample_size, random_state=42)
         fig4 = px.scatter_mapbox(
-            df.sample(min(5000, len(df)), random_state=42),
-            lat='pickup_latitude',
-            lon='pickup_longitude',
-            color='fare_amount',
-            size='fare_amount',
-            color_continuous_scale=px.colors.sequential.Viridis,
-            size_max=6,
-            opacity=0.7,
-            zoom=10,
-            mapbox_style='carto-darkmatter'
-        )
-        fig4.update_layout(
-            paper_bgcolor='black',
-            plot_bgcolor='black',
-            font_color='white'
+            df_map, lat='pickup_latitude', lon='pickup_longitude',
+            color='fare_amount', size_max=4, opacity=0.5, zoom=10,
+            mapbox_style='open-street-map'
         )
         st.plotly_chart(fig4, use_container_width=True)
