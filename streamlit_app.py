@@ -271,15 +271,5 @@ elif page == "Visualization":
         st.pyplot(fig3)
 
         # 4️⃣ Map Example (Plotly)
-        map_cols = ['pickup_latitude','pickup_longitude','fare_amount']
-        for col in map_cols:
-            if col not in data.columns:
-                data[col] = np.random.rand(len(data))*10
-        sample_size = min(5000, len(data))
-        df_map = data.sample(sample_size, random_state=42)
-        fig4 = px.scatter_mapbox(
-            df_map, lat='pickup_latitude', lon='pickup_longitude',
-            color='fare_amount', size_max=4, opacity=0.5, zoom=10,
-            mapbox_style='open-street-map'
-        )
-        st.plotly_chart(fig4, use_container_width=True)
+       plt.figure(figsize=(16, 12))
+       sns.heatmap(data.corr(numeric_only=True), annot=True, fmt='.2f', cmap='coolwarm')
