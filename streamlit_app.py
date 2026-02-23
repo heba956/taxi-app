@@ -171,13 +171,10 @@ elif page == "Taxi Model":
         
 elif page == "Visualization":
     st.info("Model Visualization — Monte Carlo Simulation")
-
-    if data is None:
-        st.warning("Dataset not loaded! Please load 'small_data.csv' first to see the plots.")
+    if data.empty:
+        st.warning("Dataset not loaded! Please load 'small_data.csv'.")
     else:
-        df = data.copy()  # نشتغل على نسخة
-
-        # ---------- تأكد من وجود الأعمدة ----------
+        df = data.copy()
         required_cols = {
             'trip_distance': (0, 20),
             'trip_duration': (1, 20),
@@ -188,13 +185,14 @@ elif page == "Visualization":
         for col, (low, high) in required_cols.items():
             if col not in df.columns:
                 df[col] = np.random.uniform(low, high, size=len(df))
-            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(np.random.uniform(low, high, size=len(df)))
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+            missing_idx = df[col].isna()
+            df.loc[missing_idx, col] = np.random.uniform(low, high, size=missing_idx.sum())
 
-        # ---------- Matplotlib Scatter Plots ----------
         plt.style.use('dark_background')
 
         fig1, ax1 = plt.subplots(figsize=(8,5))
-        ax1.scatter(df['trip_distance'], df['fare_amount'], alpha=0.5, color='#8A2BE2')
+        ax1.scatter(df['trip_distance'], df['fare_amount'], alpha=0.6, color='#FFD700')
         ax1.set_title("Trip Distance vs Fare Amount", color='white')
         ax1.set_xlabel("Trip Distance", color='white')
         ax1.set_ylabel("Fare Amount", color='white')
@@ -203,7 +201,7 @@ elif page == "Visualization":
         st.pyplot(fig1)
 
         fig2, ax2 = plt.subplots(figsize=(8,5))
-        ax2.scatter(df['trip_duration'], df['fare_amount'], alpha=0.5, color='#008080')
+        ax2.scatter(df['trip_duration'], df['fare_amount'], alpha=0.6, color='#00FFFF')
         ax2.set_title("Trip Duration vs Fare Amount", color='white')
         ax2.set_xlabel("Trip Duration", color='white')
         ax2.set_ylabel("Fare Amount", color='white')
@@ -211,14 +209,15 @@ elif page == "Visualization":
         ax2.tick_params(axis='y', colors='white')
         st.pyplot(fig2)
 
-        # ---------- Histogram ----------
-        bins = [0, 5, 10, 15, 20, 25, 30, 40, 50, 75, 200]
+        bins = [0,5,10,15,20,25,30,40,50,75,200]
         labels = ['$0–5','$5–10','$10–15','$15–20','$20–25','$25–30','$30–40','$40–50','$50–75','$75+']
         df['fare_bucket'] = pd.cut(df['fare_amount'], bins=bins, labels=labels, include_lowest=True)
         bucket_counts = df['fare_bucket'].value_counts().sort_index()
 
         fig3, ax3 = plt.subplots(figsize=(8,5))
-        ax3.bar(labels, bucket_counts, color='#008080', alpha=0.7)
+        ax3.bar(labels, bucket_counts, color='#00FF00', alpha=0.7)
+        ax3.set_facecolor('black')
+        fig3.patch.set_facecolor('black')
         ax3.set_title("Fare Distribution Histogram", color='white')
         ax3.set_xlabel("Fare Range ($)", color='white')
         ax3.set_ylabel("Number of Rides", color='white')
@@ -226,15 +225,21 @@ elif page == "Visualization":
         ax3.tick_params(axis='y', colors='white')
         st.pyplot(fig3)
 
-        # ---------- Map ----------
         fig4 = px.scatter_mapbox(
             df.sample(min(5000, len(df)), random_state=42),
             lat='pickup_latitude',
             lon='pickup_longitude',
             color='fare_amount',
-            size_max=4,
-            opacity=0.5,
+            size='fare_amount',
+            color_continuous_scale=px.colors.sequential.Viridis,
+            size_max=6,
+            opacity=0.7,
             zoom=10,
-            mapbox_style='open-street-map'
+            mapbox_style='carto-darkmatter'
+        )
+        fig4.update_layout(
+            paper_bgcolor='black',
+            plot_bgcolor='black',
+            font_color='white'
         )
         st.plotly_chart(fig4, use_container_width=True)
