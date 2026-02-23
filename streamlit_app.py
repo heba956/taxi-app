@@ -283,3 +283,21 @@ elif page == "Visualization":
     # Summary
     st.info(f"Insight: At 10km, the average fare is ${mean_path[50]:.2f}")
     st.info(f"90% of rides cost between ${p10_path[50]:.2f} and ${p90_path[50]:.2f} at 10km")
+   st.info("Matplotlib Dark Background Example")
+
+    # افتراضياً عندك DataFrame اسمه data
+    # تأكدي إنه موجود وفيه الأعمدة trip_distance و fare_amount
+    # Example: data = your_dataframe
+
+    plt.style.use('dark_background')  # Set dark background
+    purple_color = '#8A2BE2'
+
+    fig, ax = plt.subplots(figsize=(8,5))
+    ax.scatter(data['trip_distance'], data['fare_amount'], alpha=0.5, color=purple_color)
+    ax.set_title("Trip Distance vs Fare Amount (Purple on Dark Background)", color='white')
+    ax.set_xlabel("Trip Distance", color='white')
+    ax.set_ylabel("Fare Amount", color='white')
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
+
+    st.pyplot(fig)  # Show Matplotlib figure in Streamlit
