@@ -12,7 +12,18 @@ data = pd.read_csv(url)
 data.columns = data.columns.str.strip()  # remove spaces
 
 st.write("Dataset loaded! Columns available:", data.columns.tolist())
+# Convert datetime columns to datetime objects
+data['tpep_pickup_datetime'] = pd.to_datetime(data['tpep_pickup_datetime'])
+data['tpep_dropoff_datetime'] = pd.to_datetime(data['tpep_dropoff_datetime'])
 
+# Calculate trip duration in minutes
+data['trip_duration'] = (data['tpep_dropoff_datetime'] - data['tpep_pickup_datetime']).dt.total_seconds() / 60
+
+# Extract month, day, hour, and minute from pickup datetime
+data['pickup_month'] = data['tpep_pickup_datetime'].dt.month
+data['pickup_day'] = data['tpep_pickup_datetime'].dt.day
+data['pickup_hour'] = data['tpep_pickup_datetime'].dt.hour
+data['pickup_minute'] = data['tpep_pickup_datetime'].dt.minute
 # ----------------- Check required columns -----------------
 required_cols = ['trip_distance', 'trip_duration', 'fare_amount', 
                  'pickup_latitude', 'pickup_longitude']
