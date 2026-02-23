@@ -3,17 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import numpy as np
+import os
 
-# ----------------- تحميل الداتا -----------------
-st.sidebar.header("Load Data")
-uploaded_file = st.sidebar.file_uploader("Upload CSV (small version)", type="csv")
+data_path = "small_data.csv"
 
-if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
+if os.path.exists(data_path):
+    data = pd.read_csv(data_path)
     st.success(f"Dataset loaded! Shape: {data.shape}")
 else:
-    st.warning("Please upload a CSV file to enable plots.")
     data = None
+    st.warning(f"Dataset '{data_path}' not found! Please make sure it's in the app folder.")
+
     
 @st.cache_resource
 def load_model(path):
