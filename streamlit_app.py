@@ -10,7 +10,7 @@ model1 = load_model("taxi_model.pkl")
 # ----------------- Sidebar Menu -----------------
 page = st.sidebar.radio(
     "Navigation",
-    ["Home","Taxi Model","Credit Model"]
+    ["Home","Taxi Model","Visualization"]
 )
 # ---------- CSS للألوان ----------
 page_bg = """
@@ -57,8 +57,7 @@ if page == "Home":
     st.title("The Survivors ⚡")
     st.info('Welcome to Survivors Team App')
     st.header("Our Team :-")
-    st.subheader("   Heba Hassan")
-    st.subheader("   Bassant Mohammed")
+    st.subheader("   Bassant Mohammed   /    Heba Hassan")
 # 🚕 Taxi Model Page
 
 elif page == "Taxi Model":
@@ -158,11 +157,10 @@ elif page == "Taxi Model":
         prediction = model1.predict(input_df)
         st.success(f"Predicted Fare = ${prediction[0]:.2f}")
     
-# 💳 Credit Model Page
 
-elif page == "Credit Model":
-    st.header("💳 Cre.")
-    model2 = joblib.load("best_random_forest_model.pkl")
+
+elif page == "Visualization":
+    st.header("")
 
 
 
