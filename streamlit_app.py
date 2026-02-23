@@ -161,119 +161,93 @@ elif page == "Visualization":
     st.info("Model Visualization")
     fig = go.Figure()
 
-# Add all 500 individual paths (thin, semi-transparent)
-for i in range(N_PATHS):
-    color = fare_to_color(final_fares[i])
+    # Add all 500 individual paths
+    for i in range(N_PATHS):
+        color = fare_to_color(final_fares[i])
+        fig.add_trace(go.Scatter(
+            x=distances,
+            y=paths[i],
+            mode='lines',
+            line=dict(width=0.5, color=color),
+            showlegend=False,
+            hoverinfo='skip'
+        ))
+
+    # Percentile bands
     fig.add_trace(go.Scatter(
-        x=distances,
-        y=paths[i],
-        mode='lines',
-        line=dict(width=0.5, color=color),
-        showlegend=False,
-        hoverinfo='skip'
+        x=np.concatenate([distances, distances[::-1]]),
+        y=np.concatenate([p90_path, p10_path[::-1]]),
+        fill='toself',
+        fillcolor='rgba(0,200,255,0.07)',
+        line=dict(color='rgba(0,0,0,0)'),
+        name='P10–P90 Band'
     ))
 
-# Percentile bands (shaded area)
-fig.add_trace(go.Scatter(
-    x=np.concatenate([distances, distances[::-1]]),
-    y=np.concatenate([p90_path, p10_path[::-1]]),
-    fill='toself',
-    fillcolor='rgba(0,200,255,0.07)',
-    line=dict(color='rgba(0,0,0,0)'),
-    name='P10–P90 Band',
-    showlegend=True
-))
+    fig.add_trace(go.Scatter(
+        x=np.concatenate([distances, distances[::-1]]),
+        y=np.concatenate([p75_path, p25_path[::-1]]),
+        fill='toself',
+        fillcolor='rgba(0,200,255,0.12)',
+        line=dict(color='rgba(0,0,0,0)'),
+        name='P25–P75 Band'
+    ))
 
-fig.add_trace(go.Scatter(
-    x=np.concatenate([distances, distances[::-1]]),
-    y=np.concatenate([p75_path, p25_path[::-1]]),
-    fill='toself',
-    fillcolor='rgba(0,200,255,0.12)',
-    line=dict(color='rgba(0,0,0,0)'),
-    name='P25–P75 Band',
-    showlegend=True
-))
+    # Percentile lines
+    fig.add_trace(go.Scatter(
+        x=distances, y=p90_path,
+        mode='lines',
+        line=dict(color='rgba(0,245,255,0.6)', width=1.5, dash='dash'),
+        name='90th Percentile'
+    ))
 
-# P10 and P90 dashed lines
-fig.add_trace(go.Scatter(
-    x=distances, y=p90_path,
-    mode='lines',
-    line=dict(color='rgba(0,245,255,0.6)', width=1.5, dash='dash'),
-    name='90th Percentile'
-))
+    fig.add_trace(go.Scatter(
+        x=distances, y=p10_path,
+        mode='lines',
+        line=dict(color='rgba(0,245,255,0.6)', width=1.5, dash='dash'),
+        name='10th Percentile'
+    ))
 
-fig.add_trace(go.Scatter(
-    x=distances, y=p10_path,
-    mode='lines',
-    line=dict(color='rgba(0,245,255,0.6)', width=1.5, dash='dash'),
-    name='10th Percentile'
-))
+    # Mean line
+    fig.add_trace(go.Scatter(
+        x=distances, y=mean_path,
+        mode='lines',
+        line=dict(color='#FFE135', width=3.5),
+        name=f'Mean Fare (${mean_path[-1]:.2f} at {max_distance}km)'
+    ))
 
-# MEAN PATH — the golden line
-fig.add_trace(go.Scatter(
-    x=distances, y=mean_path,
-    mode='lines',
-    line=dict(color='#FFE135', width=3.5),
-    name=f'Mean Fare (${mean_path[-1]:.2f} at {max_distance}km)'
-))
+    # Annotations
+    fig.add_annotation(
+        x=max_distance, y=mean_path[-1],
+        text=f"  MEAN ${mean_path[-1]:.2f}",
+        showarrow=False,
+        font=dict(color='#FFE135', size=11)
+    )
 
-# Annotation at end of mean line
-fig.add_annotation(
-    x=max_distance, y=mean_path[-1],
-    text=f"  MEAN ${mean_path[-1]:.2f}",
-    showarrow=False,
-    font=dict(color='#FFE135', size=11, family='monospace'),
-    xanchor='left'
-)
+    fig.add_annotation(
+        x=max_distance, y=p90_path[-1],
+        text=f"  P90 ${p90_path[-1]:.2f}",
+        showarrow=False,
+        font=dict(color='cyan', size=10)
+    )
 
-fig.add_annotation(
-    x=max_distance, y=p90_path[-1],
-    text=f"  P90 ${p90_path[-1]:.2f}",
-    showarrow=False,
-    font=dict(color='rgba(0,245,255,0.8)', size=10, family='monospace'),
-    xanchor='left'
-)
+    fig.add_annotation(
+        x=max_distance, y=p10_path[-1],
+        text=f"  P10 ${p10_path[-1]:.2f}",
+        showarrow=False,
+        font=dict(color='cyan', size=10)
+    )
 
-fig.add_annotation(
-    x=max_distance, y=p10_path[-1],
-    text=f"  P10 ${p10_path[-1]:.2f}",
-    showarrow=False,
-    font=dict(color='rgba(0,245,255,0.8)', size=10, family='monospace'),
-    xanchor='left'
-)
+    # Layout
+    fig.update_layout(
+        title="Monte Carlo Fare Simulation — 500 Paths",
+        paper_bgcolor='#020408',
+        plot_bgcolor='#060D14',
+        height=500
+    )
 
-# Style
-fig.update_layout(
-    title=dict(
-        text=' Monte Carlo Fare Simulation — 500 Simultaneous Ride Paths',
-        font=dict(size=18, color='white', family='monospace'),
-        x=0.5
-    ),
-    paper_bgcolor='#020408',
-    plot_bgcolor='#060D14',
-    font=dict(color='rgba(0,245,255,0.7)', family='monospace'),
-    xaxis=dict(
-        title='Distance (km)',
-        gridcolor='rgba(0,245,255,0.06)',
-        color='rgba(0,245,255,0.5)',
-        zeroline=False
-    ),
-    yaxis=dict(
-        title='Fare Amount ($)',
-        gridcolor='rgba(0,245,255,0.06)',
-        color='rgba(0,245,255,0.5)',
-        zeroline=False
-    ),
-    legend=dict(
-        bgcolor='rgba(0,20,35,0.8)',
-        bordercolor='rgba(0,245,255,0.2)',
-        borderwidth=1,
-        font=dict(size=10)
-    ),
-    height=500,
-    margin=dict(r=120)
-)
+    # بدل fig.show()
+    st.plotly_chart(fig, use_container_width=True)
 
-fig.show()
-print(f"\n Insight: At 10km, the average fare is ${mean_path[50]:.2f}")
-print(f"   90% of rides cost between ${p10_path[50]:.2f} and ${p90_path[50]:.2f} at 10km")
+    st.info(f"At 10km avg fare = ${mean_path[50]:.2f}")
+    st.info(f"90% rides between ${p10_path[50]:.2f} and ${p90_path[50]:.2f}")
+    
