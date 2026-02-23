@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import numpy as np
 import os
-
+import plotly.graph_objects as go
 data_path = "small_data.csv"
 
 if os.path.exists(data_path):
