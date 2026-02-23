@@ -157,8 +157,21 @@ elif page == "Taxi Model":
         prediction = model1.predict(input_df)
         st.success(f"Predicted Fare = ${prediction[0]:.2f}")
     
-import matplotlib.pyplot as plt
-vis1={ِِ
+elif page == "Visualization":
+    st.info("Model Visualization")
+    fig = go.Figure()
+
+# Add all 500 individual paths (thin, semi-transparent)
+for i in range(N_PATHS):
+    color = fare_to_color(final_fares[i])
+    fig.add_trace(go.Scatter(
+        x=distances,
+        y=paths[i],
+        mode='lines',
+        line=dict(width=0.5, color=color),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
 
 # Percentile bands (shaded area)
 fig.add_trace(go.Scatter(
@@ -262,7 +275,5 @@ fig.update_layout(
 )
 
 fig.show()
-}
-elif page == "Visualization":
-    st.info("")
-    print(vis1)
+print(f"\n Insight: At 10km, the average fare is ${mean_path[50]:.2f}")
+print(f"   90% of rides cost between ${p10_path[50]:.2f} and ${p90_path[50]:.2f} at 10km")
